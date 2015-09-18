@@ -34,23 +34,29 @@ AppAsset::register($this);
                         'class' => 'navbar-inverse navbar-fixed-top',
                     ],
                 ]);
+
                 echo Yii::$app->user->isGuest ? "" : Nav::widget([
                             'options' => ['class' => 'navbar-nav navbar-right'],
                             'items' => [
                                 [ 'label' => Yii::t('app', 'Users'),
-                                    'url' => ['/user']
+                                    'url' => ['/user'],
+                                    'visible' => Yii::$app->user->identity->role === "admin"
                                 ],
                                 [ 'label' => Yii::t('app', 'Examination'),
-                                    'url' => ['/exam']
+                                    'url' => ['/exam'],
+                                    'visible' => Yii::$app->user->identity->role === "teacher"
                                 ],
                                 [ 'label' => Yii::t('app', 'Question'),
-                                    'url' => ['/question']
+                                    'url' => ['/question'],
+                                    'visible' => Yii::$app->user->identity->role === "teacher"
                                 ],
                                 [ 'label' => Yii::t('app', 'Answer'),
-                                    'url' => ['/answer']
+                                    'url' => ['/answer'],
+                                    'visible' => Yii::$app->user->identity->role === "teacher"
                                 ],
                                 [ 'label' => Yii::t('app', 'User Score'),
-                                    'url' => ['/userScore']
+                                    'url' => ['/userScore'],
+                                    'visible' => Yii::$app->user->identity->role === "student"
                                 ],
                                 [ 'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
                                     'url' => ['/site/logout'],
@@ -83,7 +89,7 @@ AppAsset::register($this);
         <?php $this->endBody() ?>
         <script>
             $(document).ready(function (e) {
-                $("input.form-control").first().focus();
+                $("input[class='form-control']").first().focus();
             });
         </script>
     </body>

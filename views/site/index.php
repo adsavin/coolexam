@@ -6,43 +6,26 @@ $this->title = 'My Yii Application';
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="jumbotron">
-            <h1>Congratulations!</h1>
-
-            <p class="lead">You have successfully created your Yii-powered application.</p>
-
-            <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+            <h1><?= $exam->subject ?></h1>
+            <p class="lead"><?= Yii::t("app", "Duration") . ": " . $exam->duration . " " . Yii::t('app', 'Minutes') ?></p>
+            <p class="lead"><?= Yii::t("app", "Start From") . ": " . $exam->exam_date ?></p>
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-4">
-        <h2>Heading</h2>
-
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-            fugiat nulla pariatur.</p>
-
-        <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+<?php if ($exam): $i = 0;
+    ?>
+    <div class="row">
+        <?php foreach ($exam->getQuestions()->all() as $question): ?>
+            <div class="col-lg-4 col-md-6">
+                <p><?= ++$i . ". " . $question->title . " <strong>" . $question->score . " Point(s)</strong>" ?></p>
+                <div>
+                    <?php foreach ($question->getAnswers()->all() as $answer) : ?>
+                        <div class="radio">
+                            <label><input type="radio" name="optradio"><?= $answer->title ?></label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
-    <div class="col-lg-4">
-        <h2>Heading</h2>
-
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-            fugiat nulla pariatur.</p>
-
-        <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-    </div>
-    <div class="col-lg-4">
-        <h2>Heading</h2>
-
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-            fugiat nulla pariatur.</p>
-
-        <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-    </div>
-</div>
+<?php endif; ?>

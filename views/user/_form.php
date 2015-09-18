@@ -24,11 +24,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'role')->textInput() ?>
+    <?= $form->field($model, 'status')->textInput() ?>
 
     <?= $form->field($model, 'password_reset_token')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->dropDownList([ 'admin' => 'Admin', 'teacher' => 'Teacher', 'student' => 'Student', ], ['prompt' => '']) ?>
+    <?= $form->field($model, 'role')->dropDownList([ 'admin' => 'Admin', 'teacher' => 'Teacher', 'student' => 'Student', ], ['prompt' => '']) ?>
 
     <?= $form->field($model, 'auth_key')->textInput(['maxlength' => true]) ?>
 

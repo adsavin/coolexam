@@ -19,21 +19,19 @@ use Yii;
  * @property Question[] $questions
  * @property UserScrore[] $userScrores
  */
-class ExamBase extends \yii\db\ActiveRecord
-{
+class ExamBase extends \yii\db\ActiveRecord {
+
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'exam';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['subject', 'duration', 'created_time', 'completed', 'exam_date', 'user_id'], 'required'],
             [['duration', 'completed', 'user_id'], 'integer'],
@@ -45,8 +43,7 @@ class ExamBase extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => Yii::t('app', 'ID'),
             'subject' => Yii::t('app', 'Subject'),
@@ -61,24 +58,22 @@ class ExamBase extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getQuestions()
-    {
+    public function getQuestions() {
         return $this->hasMany(Question::className(), ['exam_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUserScrores()
-    {
+    public function getUserScrores() {
         return $this->hasMany(UserScrore::className(), ['exam_id' => 'id']);
     }
+
 }

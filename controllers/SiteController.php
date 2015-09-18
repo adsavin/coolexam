@@ -82,7 +82,8 @@ class SiteController extends Controller {
         if (\Yii::$app->user->isGuest) {
             $this->redirect(array("login"));
         } else {
-            return $this->render('index');
+            $exam = \app\models\Exam::find()->where("1=1")->one();
+            return $this->render('index', ["exam" => $exam]);
         }
     }
 
