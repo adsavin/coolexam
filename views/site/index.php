@@ -1,7 +1,12 @@
 <?php
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\helpers\ArrayHelper;
+use app\models\Answer;
+
+$this->title = Yii::t('app', 'Examination');
 ?>
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -15,17 +20,35 @@ $this->title = 'My Yii Application';
 <?php if ($exam): $i = 0;
     ?>
     <div class="row">
-        <?php foreach ($exam->getQuestions()->all() as $question): ?>
+        <?php $form = ActiveForm::begin(); ?>
+
+        <?php
+        foreach ($exam->getQuestions()->all() as $question):
+            ?>
             <div class="col-lg-4 col-md-6">
-                <p><?= ++$i . ". " . $question->title . " <strong>" . $question->score . " Point(s)</strong>" ?></p>
+                <p><?= ++$i . ". " . $question->title . " <strong style='color: red'>" . $question->score . " Point(s)</strong>" ?></p>
                 <div>
-                    <?php foreach ($question->getAnswers()->all() as $answer) : ?>
-                        <div class="radio">
-                            <label><input type="radio" name="optradio"><?= $answer->title ?></label>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php
+                    echo Html::radioList("Answers[$question->id]", null, ArrayHelper::map($question->getAnswers()->all(), "id", "title"), ['separator' => "<br/>",
+                        'encode' => false
+                    ]);
+                    ?>
                 </div>
             </div>
-        <?php endforeach; ?>
+        <?php endforeach; ?>                
     </div>
+    <hr/>
+    <div class="form-group ">
+        <?= Html::submitButton(Yii::t('app', 'Submit'), ['class' => 'btn btn-success btn-lg center-block']) ?>        
+    </div>
+    <?php ActiveForm::end(); ?>
 <?php endif; ?>
+
+<?php
+$this->registerJs("
+                setTimeout(function () {
+                alert('Time is up');
+                $('#btnlogout').click();
+        }, 5000);
+                ")
+?>

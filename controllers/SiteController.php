@@ -7,9 +7,11 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
-use app\components\AccessRule;
 use app\models\User;
+use app\models\Answer;
+use app\models\Exam;
+use app\models\UserScore;
+use app\models\UserHasAnswer;
 
 class SiteController extends Controller {
 
@@ -35,37 +37,6 @@ class SiteController extends Controller {
         ];
     }
 
-//    public function behaviors() {
-//        return [
-//            'access' => [
-//                'class' => AccessControl::className(),
-//                'only' => ['index', 'create', 'view'], // กำหนด action ทั้งหมดภายใน Controller นี้
-//                'ruleConfig' => [
-//                    'class' => AccessRule::className() // เรียกใช้งาน accessRule (component) ที่เราสร้างขึ้นใหม่
-//                ],
-//                'rules' => [
-//                    [
-//                        'actions' => ['index', 'login'], // กำหนด rules ให้ actionIndex()
-//                        'allow' => false,
-//                        'roles' => [
-//                            User::ROLE_STUDENT, // อนุญาตให้ "ผู้ใช้งาน / สมาชิก" ใช้งานได้
-//                            User::ROLE_TEACHER, // อนุญาตให้ "พนักงาน" ใช้งานได้
-//                            User::ROLE_ADMIN        // อนุญาตให้ "ผู้ดูแลระบบ" ใช้งานได้
-//                        ]
-//                    ],
-//                    [
-//                        'actions' => ['create'], // กำหนด rules ให้ actionCreate()
-//                        'allow' => true,
-//                        'roles' => [
-//                            User::ROLE_STUDENT, // อนุญาตให้ "พนักงาน" ใช้งานได้
-//                            User::ROLE_ADMIN        // อนุญาตให้ "ผู้ดูแลระบบ" ใช้งานได้
-//                        ]
-//                    ]
-//                ],
-//            ],
-//        ];
-//    }
-
     public function actions() {
         return [
             'error' => [
@@ -82,10 +53,53 @@ class SiteController extends Controller {
         if (\Yii::$app->user->isGuest) {
             $this->redirect(array("login"));
         } else {
-            $exam = \app\models\Exam::find()->where("1=1")->one();
+            $exam = Exam::find()->where("1=1")->one(); // modify later
+            if (Yii::$app->request->post()) {
+                $post = Yii::$app->request->post();
+                $answers = $post["Answers"];
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $userscore = new UserScore();
+                    $userscore->finished_time = date("Y-m-d H:i:s");
+                    $userscore->user_id = Yii::$app->user->identity->id;
+                    $userscore->exam_id = $exam->id;
+                    $userscore->score = 0;
+                    $userAnswers = [];
+                    $totalScore = 0;
+                    foreach ($exam->getQuestions()->all() as $question) {
+                        $userAnswer = new UserHasAnswer();
+                        $userAnswer->user_id = Yii::$app->user->identity->id;
+                        $userAnswer->answer_id = $answers[$question->id];
+                        $userAnswer->exam_id = $exam->id;
+                        $userAnswer->save();
+                        $correctAnswer = Answer::find()->where("is_correct=:is_correct AND question_id=:question_id", [":is_correct" => 1, ":question_id" => $question->id])->one();
+                        if ($userAnswer->answer_id === $correctAnswer->id) {
+                            $userscore->score += $question->score;
+                        }
+                        $totalScore += $question->score;
+                        $userAnswers[] = $userAnswer;
+                    }
+                    $userAnswer->save();
+                    $transaction->commit();
+//                    $this->redirect(["showScore"], ["userAnswers" => $userAnswers, "userScore" => $userscore]);
+                    return $this->render("score_summary", [
+                                "userAnswers" => $userAnswers,
+                                "userScore" => $userscore,
+                                "totalScore" => $totalScore
+                    ]);
+                } catch (Exception $exc) {
+                    $transaction->rollBack();
+                    Yii::$app->session->setFlash("error", $exc->getTraceAsString());
+                }
+            }
+
             return $this->render('index', ["exam" => $exam]);
         }
     }
+
+//    public function actionShowScore($userAnswers, $userscore) {
+//        $this
+//    }
 
     public function actionLogin() {
         if (!\Yii::$app->user->isGuest) {
